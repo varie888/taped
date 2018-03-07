@@ -8,4 +8,53 @@
     tools:context="com.taped.taped.MainActivity"
     tools:showIn="@layout/activity_main">
 
+    <ScrollView
+        android:id="@+id/main_form"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/lin_login_form"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <AutoCompleteTextView
+                    android:id="@+id/remoteip"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/prompt_remoteip"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:singleLine="true" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/stream_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="@dimen/fab_margin"
+                android:text="@string/action_stream"
+                android:textStyle="bold"
+                app:srcCompat="@android:drawable/ic_menu_upload_you_tube" />
+
+            <TextView
+                android:id="@+id/my_ip_id"
+                android:layout_marginTop="48dp"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:textStyle="bold"
+                android:textSize="22sp"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/myip" />
+
+        </LinearLayout>
+    </ScrollView>
 </android.support.constraint.ConstraintLayout>
