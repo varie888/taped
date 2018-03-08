@@ -55,6 +55,13 @@
                 android:layout_gravity="center_horizontal"
                 android:text="@string/myip" />
 
+            <TextureView
+                android:id="@+id/texture"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|right"
+                android:layout_alignParentTop="true"/>
+
         </LinearLayout>
     </ScrollView>
 </android.support.constraint.ConstraintLayout>
