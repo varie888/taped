@@ -24,6 +24,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -35,6 +36,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.taped.utils.MarshMallowPermission;
 import com.taped.utils.Utils;
 
 import java.io.File;
@@ -58,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
         ORIENTATIONS.append(Surface.ROTATION_270, 180);
     }
 
+    public static final int CAMERA_PERMISSION_REQUEST_CODE = 3;
+
     private String cameraId;
     protected CameraDevice cameraDevice;
     protected CameraCaptureSession cameraCaptureSessions;
@@ -70,10 +74,17 @@ public class MainActivity extends AppCompatActivity {
     private ImageReader imageReader;
     private static final int REQUEST_CAMERA_PERMISSION = 200;
 
+    MarshMallowPermission marshMallowPermission = new MarshMallowPermission(this);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (!marshMallowPermission.checkPermissionForCamera()){
+            marshMallowPermission.requestPermissionForCamera();
+        }
+
         textureView = (TextureView) findViewById(R.id.texture);
         assert textureView != null;
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -312,6 +323,7 @@ public class MainActivity extends AppCompatActivity {
             imageReader = null;
         }
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_CAMERA_PERMISSION) {
