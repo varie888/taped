@@ -21,4 +21,13 @@
 
     <string name="myip">My IP: 10.107.107.145</string>
 
+    <string name="title_activity_call">Call</string>
+    <string name="receive_button">Receive</string>
+    <string name="reject_button">Reject</string>
+    <string name="call_content">Call From ...</string>
+
+    <string name="title_activity_chat">Chat</string>
+    <string name="hangup_button">Hang Up</string>
+    <string name="chat_content">CHATING...</string>
+
 </resources>
