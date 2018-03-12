@@ -33,9 +33,11 @@ import android.util.SparseIntArray;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
+import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.taped.communication.CallCommunicator;
 import com.taped.utils.MarshMallowPermission;
 import com.taped.utils.Utils;
 
@@ -85,21 +87,33 @@ public class MainActivity extends AppCompatActivity {
             marshMallowPermission.requestPermissionForCamera();
         }
 
+        if (!marshMallowPermission.checkPermissionForExternalStorage()){
+            marshMallowPermission.requestPermissionForExternalStorage();
+        }
+
         textureView = (TextureView) findViewById(R.id.texture);
         assert textureView != null;
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        AutoCompleteTextView remoteiptv = (AutoCompleteTextView)findViewById(R.id.remoteip);
+
         TextView iptv = (TextView)findViewById(R.id.my_ip_id);
 
-        iptv.setText(Utils.getIPAddress(getApplicationContext()));
+        final String myip = Utils.getIPAddress(getApplicationContext());
+        iptv.setText("My IP: " + myip);
+
+        final String remoteip = remoteiptv.getText().toString();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.stream_button);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own stream action", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "Calling...", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+
+                // calling remote party
+                CallCommunicator.call(myip, remoteip);
             }
         });
     }

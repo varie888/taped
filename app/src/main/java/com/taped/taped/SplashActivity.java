@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import com.taped.preferences.LoginSharedPreferences;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -25,7 +27,16 @@ public class SplashActivity extends AppCompatActivity {
 
                 @Override
                 public void run() {
-                    Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
+
+                    Intent intent = null;
+                    if (LoginSharedPreferences.getUserName(SplashActivity.this).length() == 0)
+                    {
+                        intent = new Intent(SplashActivity.this, LoginActivity.class);
+                    }
+                    else
+                    {
+                        intent = new Intent(SplashActivity.this, MainActivity.class);
+                    }
                     startActivity(intent);
                     finish();
                 }

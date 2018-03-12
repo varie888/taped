@@ -16,7 +16,7 @@
         <LinearLayout
             android:id="@+id/lin_login_form"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical">
 
             <android.support.design.widget.TextInputLayout
@@ -38,39 +38,31 @@
                 android:id="@+id/stream_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_margin="@dimen/fab_margin"
+                android:layout_marginTop="32dp"
                 android:text="@string/action_stream"
                 android:textStyle="bold"
                 app:srcCompat="@android:drawable/ic_menu_upload_you_tube" />
 
             <TextView
                 android:id="@+id/my_ip_id"
-                android:layout_marginTop="48dp"
-                android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                android:textStyle="bold"
-                android:textSize="22sp"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="@string/myip" />
+                android:layout_marginTop="48dp"
+                android:text="@string/myip"
+                android:textSize="22sp"
+                android:textStyle="bold" />
 
             <TextureView
                 android:id="@+id/texture"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_above="@+id/btn_takepicture"
-                android:layout_alignParentTop="true"/>
+                android:layout_alignParentTop="true"
+                android:layout_gravity="bottom|right" />
 
-            <Button
-                android:id="@+id/btn_takepicture"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                android:layout_marginBottom="16dp"
-                android:layout_marginTop="16dp"
-                android:text="Pict" />
         </LinearLayout>
     </ScrollView>
 </android.support.constraint.ConstraintLayout>

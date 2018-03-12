@@ -30,6 +30,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.taped.preferences.LoginSharedPreferences;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -332,6 +334,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
 
             if (success) {
+                LoginSharedPreferences.setUserName(LoginActivity.this, mUser);
+
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
