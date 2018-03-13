@@ -38,6 +38,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.taped.communication.CallCommunicator;
+import com.taped.taped.callbacks.MainActivityCallCallback;
 import com.taped.utils.MarshMallowPermission;
 import com.taped.utils.Utils;
 
@@ -112,8 +113,9 @@ public class MainActivity extends AppCompatActivity {
                 Snackbar.make(view, "Calling...", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
 
+                MainActivityCallCallback cc = new MainActivityCallCallback();
                 // calling remote party
-                CallCommunicator.call(myip, remoteip);
+                CallCommunicator.call(cc, myip, remoteip);
             }
         });
     }
