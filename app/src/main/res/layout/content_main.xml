@@ -55,14 +55,6 @@
                 android:textSize="22sp"
                 android:textStyle="bold" />
 
-            <TextureView
-                android:id="@+id/texture"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_above="@+id/btn_takepicture"
-                android:layout_alignParentTop="true"
-                android:layout_gravity="bottom|right" />
-
         </LinearLayout>
     </ScrollView>
 </android.support.constraint.ConstraintLayout>

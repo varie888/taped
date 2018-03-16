@@ -28,6 +28,6 @@
 
     <string name="title_activity_chat">Chat</string>
     <string name="hangup_button">Hang Up</string>
-    <string name="chat_content">CHATING...</string>
+    <string name="chat_content">CHATTING...</string>
 
 </resources>
