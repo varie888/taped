@@ -41,7 +41,7 @@ public class ListenThread extends Thread {
         }
         catch (Exception e)
         {
-
+            e.printStackTrace();
         }
 
     }

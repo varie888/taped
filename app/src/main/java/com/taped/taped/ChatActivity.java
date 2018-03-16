@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.taped.camera.preview.RemotePreview;
 import com.taped.camera.preview.SelfPreview;
+import com.taped.camera.source.ServerThread;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -109,7 +110,7 @@ public class ChatActivity extends AppCompatActivity {
 
         mVisible = true;
         mControlsView = findViewById(R.id.fullscreen_content_controls);
-        mContentView = findViewById(R.id.fullscreen_content);
+        mContentView = findViewById(R.id.camera_preview);
 
 
         // Set up the user interaction to manually show or hide the system UI.

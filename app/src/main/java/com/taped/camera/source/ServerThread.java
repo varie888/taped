@@ -69,6 +69,11 @@ public class ServerThread implements Runnable {
                     s.setKeepAlive(true);
                     os = s.getOutputStream();
                     while(true){
+                        //mActivityInstance.getPreview().takePicture();
+
+                        if (mActivityInstance.getPreview().getFrameBuffer() == null)
+                            continue;
+
                         DataOutputStream dos = new DataOutputStream(os);
                         dos.writeInt(4);
                         dos.writeUTF("#@@#");

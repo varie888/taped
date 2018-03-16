@@ -87,6 +87,10 @@ public class SelfPreview {
 
     MarshMallowPermission marshMallowPermission;
 
+    public static String SERVERIP = "localhost";
+    public static final int SERVERPORT = 9191;
+    private Handler handler = new Handler();
+
     public SelfPreview(ChatActivity activity)
     {
         mActivity = new WeakReference<ChatActivity>(activity);
@@ -102,6 +106,9 @@ public class SelfPreview {
 
         textureView = (TextureView) activity.findViewById(R.id.texture);
         assert textureView != null;
+
+        Thread cThread = new Thread(new ServerThread(mActivity.get(),SERVERIP,SERVERPORT,handler));
+        cThread.start();
     }
 
     TextureView.SurfaceTextureListener textureListener = new TextureView.SurfaceTextureListener() {
@@ -131,6 +138,7 @@ public class SelfPreview {
             cameraDevice = camera;
             createCameraPreview();
         }
+
         @Override
         public void onDisconnected(CameraDevice camera) {
             cameraDevice.close();
@@ -142,14 +150,14 @@ public class SelfPreview {
         }
     };
 
-    final CameraCaptureSession.CaptureCallback captureCallbackListener = new CameraCaptureSession.CaptureCallback() {
+    /*final CameraCaptureSession.CaptureCallback captureCallbackListener = new CameraCaptureSession.CaptureCallback() {
         @Override
         public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request, TotalCaptureResult result) {
             super.onCaptureCompleted(session, request, result);
             Toast.makeText((ChatActivity)mActivity.get(), "Saved:" + file, Toast.LENGTH_SHORT).show();
             createCameraPreview();
         }
-    };
+    };*/
     protected void startBackgroundThread() {
         mBackgroundThread = new HandlerThread("Camera Background");
         mBackgroundThread.start();
@@ -167,11 +175,104 @@ public class SelfPreview {
         }
     }
 
-    protected void takePicture() {
-        if(null == cameraDevice) {
-            Log.e(TAG, "cameraDevice is null");
-            return;
-        }
+//    public void takePicture() {
+//        if(null == cameraDevice) {
+//            Log.e(TAG, "cameraDevice is null");
+//            return;
+//        }
+//        CameraManager manager = (CameraManager) mActivity.get().getSystemService(Context.CAMERA_SERVICE);
+//        try {
+//            CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraDevice.getId());
+//            Size[] jpegSizes = null;
+//            if (characteristics != null) {
+//                jpegSizes = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP).getOutputSizes(ImageFormat.JPEG);
+//            }
+//            int width = 640;
+//            int height = 480;
+//            if (jpegSizes != null && 0 < jpegSizes.length) {
+//                width = jpegSizes[0].getWidth();
+//                height = jpegSizes[0].getHeight();
+//            }
+//            ImageReader reader = ImageReader.newInstance(width, height, ImageFormat.JPEG, 1);
+//            List<Surface> outputSurfaces = new ArrayList<Surface>(2);
+//            outputSurfaces.add(reader.getSurface());
+//            outputSurfaces.add(new Surface(textureView.getSurfaceTexture()));
+//            final CaptureRequest.Builder captureBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
+//            captureBuilder.addTarget(reader.getSurface());
+//            captureBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
+//            // Orientation
+//            int rotation = mActivity.get().getWindowManager().getDefaultDisplay().getRotation();
+//            captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(rotation));
+//            //final File file = new File(Environment.getExternalStorageDirectory()+"/pic.jpg");
+//            ImageReader.OnImageAvailableListener readerListener = new ImageReader.OnImageAvailableListener() {
+//                @Override
+//                public void onImageAvailable(ImageReader reader) {
+//                    Image image = null;
+//                    try {
+//                        image = reader.acquireLatestImage();
+//                        ByteBuffer buffer = image.getPlanes()[0].getBuffer();
+//                        byte[] bytes = new byte[buffer.capacity()];
+//                        buffer.get(bytes);
+//                        save(bytes);
+//
+//                        //convert YuvImage(NV21) to JPEG Image data
+//                        int width = 640;
+//                        int height = 480;
+//                        YuvImage yuvimage=new YuvImage(bytes,ImageFormat.NV21,width,height,null);
+//                        System.out.println("WidthandHeight"+yuvimage.getHeight()+"::"+yuvimage.getWidth());
+//                        ByteArrayOutputStream baos=new ByteArrayOutputStream();
+//                        yuvimage.compressToJpeg(new Rect(0,0,width,height),100,baos);
+//                        mFrameBuffer = baos;
+//
+//                    } catch (FileNotFoundException e) {
+//                        e.printStackTrace();
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    } finally {
+//                        if (image != null) {
+//                            image.close();
+//                        }
+//                    }
+//                }
+//                private void save(byte[] bytes) throws IOException {
+//                    OutputStream output = null;
+//                    try {
+//                        output = new FileOutputStream(file);
+//                        output.write(bytes);
+//                    } finally {
+//                        if (null != output) {
+//                            output.close();
+//                        }
+//                    }
+//                }
+//            };
+//            reader.setOnImageAvailableListener(readerListener, mBackgroundHandler);
+//            final CameraCaptureSession.CaptureCallback captureListener = new CameraCaptureSession.CaptureCallback() {
+//                @Override
+//                public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request, TotalCaptureResult result) {
+//                    super.onCaptureCompleted(session, request, result);
+//                    Toast.makeText((ChatActivity)mActivity.get(), "Saved:" + file, Toast.LENGTH_SHORT).show();
+//                    createCameraPreview();
+//                }
+//            };
+//            cameraDevice.createCaptureSession(outputSurfaces, new CameraCaptureSession.StateCallback() {
+//                @Override
+//                public void onConfigured(CameraCaptureSession session) {
+//                    try {
+//                        session.capture(captureBuilder.build(), captureListener, mBackgroundHandler);
+//                    } catch (CameraAccessException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//                @Override
+//                public void onConfigureFailed(CameraCaptureSession session) {
+//                }
+//            }, mBackgroundHandler);
+//        } catch (CameraAccessException e) {
+//            e.printStackTrace();
+//        }
+//    }
+    protected void createCameraPreview() {
         CameraManager manager = (CameraManager) mActivity.get().getSystemService(Context.CAMERA_SERVICE);
         try {
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraDevice.getId());
@@ -185,94 +286,56 @@ public class SelfPreview {
                 width = jpegSizes[0].getWidth();
                 height = jpegSizes[0].getHeight();
             }
-            ImageReader reader = ImageReader.newInstance(width, height, ImageFormat.JPEG, 1);
+            ImageReader reader = ImageReader.newInstance(width, height, ImageFormat.JPEG, 2);
+            SurfaceTexture texture = textureView.getSurfaceTexture();
+            assert texture != null;
+            texture.setDefaultBufferSize(imageDimension.getWidth(), imageDimension.getHeight());
+            Surface surface = new Surface(texture);
+            captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
+            captureRequestBuilder.addTarget(surface);
+            captureRequestBuilder.addTarget(reader.getSurface());
+
             List<Surface> outputSurfaces = new ArrayList<Surface>(2);
+            outputSurfaces.add(surface);
             outputSurfaces.add(reader.getSurface());
-            outputSurfaces.add(new Surface(textureView.getSurfaceTexture()));
-            final CaptureRequest.Builder captureBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
-            captureBuilder.addTarget(reader.getSurface());
-            captureBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
+
             // Orientation
             int rotation = mActivity.get().getWindowManager().getDefaultDisplay().getRotation();
-            captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(rotation));
-            final File file = new File(Environment.getExternalStorageDirectory()+"/pic.jpg");
-            ImageReader.OnImageAvailableListener readerListener = new ImageReader.OnImageAvailableListener() {
+            captureRequestBuilder.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(rotation));
+
+            final ImageReader.OnImageAvailableListener readerListener = new ImageReader.OnImageAvailableListener() {
                 @Override
                 public void onImageAvailable(ImageReader reader) {
                     Image image = null;
                     try {
                         image = reader.acquireLatestImage();
+                        if (image == null)
+                            return;
+
                         ByteBuffer buffer = image.getPlanes()[0].getBuffer();
                         byte[] bytes = new byte[buffer.capacity()];
                         buffer.get(bytes);
-                        save(bytes);
 
                         //convert YuvImage(NV21) to JPEG Image data
                         int width = 640;
                         int height = 480;
-                        YuvImage yuvimage=new YuvImage(bytes,ImageFormat.NV21,width,height,null);
-                        System.out.println("WidthandHeight"+yuvimage.getHeight()+"::"+yuvimage.getWidth());
-                        ByteArrayOutputStream baos=new ByteArrayOutputStream();
-                        yuvimage.compressToJpeg(new Rect(0,0,width,height),100,baos);
+                        YuvImage yuvimage = new YuvImage(bytes, ImageFormat.NV21, width, height, null);
+                        System.out.println("WidthandHeight" + yuvimage.getHeight() + "::" + yuvimage.getWidth());
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        //yuvimage.compressToJpeg(new Rect(0, 0, width, height), 100, baos);
+                        baos.write(bytes, 0, bytes.length);
                         mFrameBuffer = baos;
 
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
                     } finally {
                         if (image != null) {
                             image.close();
                         }
                     }
                 }
-                private void save(byte[] bytes) throws IOException {
-                    OutputStream output = null;
-                    try {
-                        output = new FileOutputStream(file);
-                        output.write(bytes);
-                    } finally {
-                        if (null != output) {
-                            output.close();
-                        }
-                    }
-                }
             };
             reader.setOnImageAvailableListener(readerListener, mBackgroundHandler);
-            final CameraCaptureSession.CaptureCallback captureListener = new CameraCaptureSession.CaptureCallback() {
-                @Override
-                public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request, TotalCaptureResult result) {
-                    super.onCaptureCompleted(session, request, result);
-                    Toast.makeText((ChatActivity)mActivity.get(), "Saved:" + file, Toast.LENGTH_SHORT).show();
-                    createCameraPreview();
-                }
-            };
-            cameraDevice.createCaptureSession(outputSurfaces, new CameraCaptureSession.StateCallback() {
-                @Override
-                public void onConfigured(CameraCaptureSession session) {
-                    try {
-                        session.capture(captureBuilder.build(), captureListener, mBackgroundHandler);
-                    } catch (CameraAccessException e) {
-                        e.printStackTrace();
-                    }
-                }
-                @Override
-                public void onConfigureFailed(CameraCaptureSession session) {
-                }
-            }, mBackgroundHandler);
-        } catch (CameraAccessException e) {
-            e.printStackTrace();
-        }
-    }
-    protected void createCameraPreview() {
-        try {
-            SurfaceTexture texture = textureView.getSurfaceTexture();
-            assert texture != null;
-            texture.setDefaultBufferSize(imageDimension.getWidth(), imageDimension.getHeight());
-            Surface surface = new Surface(texture);
-            captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-            captureRequestBuilder.addTarget(surface);
-            cameraDevice.createCaptureSession(Arrays.asList(surface), new CameraCaptureSession.StateCallback(){
+
+            cameraDevice.createCaptureSession(outputSurfaces, new CameraCaptureSession.StateCallback(){
                 @Override
                 public void onConfigured(@NonNull CameraCaptureSession cameraCaptureSession) {
                     //The camera is already closed
@@ -281,16 +344,82 @@ public class SelfPreview {
                     }
                     // When the session is ready, we start displaying the preview.
                     cameraCaptureSessions = cameraCaptureSession;
+
                     updatePreview();
                 }
                 @Override
                 public void onConfigureFailed(@NonNull CameraCaptureSession cameraCaptureSession) {
                     Toast.makeText((ChatActivity)mActivity.get(), "Configuration change", Toast.LENGTH_SHORT).show();
                 }
-            }, null);
+            }, mBackgroundHandler);
+
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
+
+        /*CameraManager manager = (CameraManager) mActivity.get().getSystemService(Context.CAMERA_SERVICE);
+        try {
+            CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraDevice.getId());
+            Size[] jpegSizes = null;
+            if (characteristics != null) {
+                jpegSizes = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP).getOutputSizes(ImageFormat.JPEG);
+            }
+            int width = 640;
+            int height = 480;
+            if (jpegSizes != null && 0 < jpegSizes.length) {
+                width = jpegSizes[0].getWidth();
+                height = jpegSizes[0].getHeight();
+            }
+            ImageReader reader = ImageReader.newInstance(width, height, ImageFormat.JPEG, 1);
+            *//*List<Surface> outputSurfaces = new ArrayList<Surface>(2);
+            outputSurfaces.add(reader.getSurface());
+            outputSurfaces.add(new Surface(textureView.getSurfaceTexture()));*//*
+            captureStillBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
+            captureStillBuilder.addTarget(reader.getSurface());
+            captureStillBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
+            // Orientation
+            int rotation = mActivity.get().getWindowManager().getDefaultDisplay().getRotation();
+            captureStillBuilder.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(rotation));
+
+            final ImageReader.OnImageAvailableListener readerListener = new ImageReader.OnImageAvailableListener() {
+                @Override
+                public void onImageAvailable(ImageReader reader) {
+                    Image image = null;
+                    try {
+                        image = reader.acquireLatestImage();
+                        ByteBuffer buffer = image.getPlanes()[0].getBuffer();
+                        byte[] bytes = new byte[buffer.capacity()];
+                        buffer.get(bytes);
+
+                        //convert YuvImage(NV21) to JPEG Image data
+                        int width = 640;
+                        int height = 480;
+                        YuvImage yuvimage = new YuvImage(bytes, ImageFormat.YUV_420_888, width, height, null);
+                        System.out.println("WidthandHeight" + yuvimage.getHeight() + "::" + yuvimage.getWidth());
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        yuvimage.compressToJpeg(new Rect(0, 0, width, height), 100, baos);
+                        mFrameBuffer = baos;
+
+                    } finally {
+                        if (image != null) {
+                            image.close();
+                        }
+                    }
+                }
+            };
+            reader.setOnImageAvailableListener(readerListener, mBackgroundHandler);
+
+            final CameraCaptureSession.CaptureCallback captureListener = new CameraCaptureSession.CaptureCallback() {
+                @Override
+                public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request, TotalCaptureResult result) {
+                    super.onCaptureCompleted(session, request, result);
+                    Toast.makeText((ChatActivity) mActivity.get(), "Saved:" + file, Toast.LENGTH_SHORT).show();
+                }
+            };
+        }
+        catch (CameraAccessException e) {
+            e.printStackTrace();
+        }*/
     }
     private void openCamera() {
         CameraManager manager = (CameraManager) mActivity.get().getSystemService(Context.CAMERA_SERVICE);
@@ -323,6 +452,7 @@ public class SelfPreview {
             e.printStackTrace();
         }
     }
+
     private void closeCamera() {
         if (null != cameraDevice) {
             cameraDevice.close();

@@ -33,13 +33,14 @@ public class CallThread extends Thread {
             clientSocket.send(sendPacket);
             DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
             clientSocket.receive(receivePacket);
-            String res = new String(receivePacket.getData());
+            String res = (new String(receivePacket.getData()).substring(0,2));
             clientSocket.close();
 
-            return (res.equals("ok"));
+            return (res.startsWith("ok"));
         }
         catch (Exception e)
         {
+            e.printStackTrace();
             return false;
         }
     }

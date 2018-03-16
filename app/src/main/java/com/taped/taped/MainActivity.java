@@ -96,11 +96,11 @@ public class MainActivity extends AppCompatActivity {
     public class MainActivityCallCallback implements ICallCallback {
         public void callback(boolean approved)
         {
-            if (approved) {
+            /*if (approved) {
                 Intent intent = new Intent(MainActivity.this, ChatActivity.class);
                 startActivity(intent);
                 finish();
-            }
+            }*/
         }
     }
 

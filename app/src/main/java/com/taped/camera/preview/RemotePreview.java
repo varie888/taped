@@ -39,13 +39,13 @@ public class RemotePreview {
 
     private Bitmap mLastFrame;
 
-    private int face_count;
+    //private int face_count;
     private Handler mHandler;
 
-    private FaceDetector mFaceDetector = new FaceDetector(320,240,10);
+    /*private FaceDetector mFaceDetector = new FaceDetector(320,240,10);
     private FaceDetector.Face[] faces = new FaceDetector.Face[10];
     private PointF tmp_point = new PointF();
-    private Paint tmp_paint = new Paint();
+    private Paint tmp_paint = new Paint();*/
 
 
     private Runnable mStatusChecker = new Runnable() {
@@ -58,18 +58,18 @@ public class RemotePreview {
                         if (mLastFrame!=null){
 
                             Bitmap mutableBitmap = mLastFrame.copy(Bitmap.Config.RGB_565, true);
-                            face_count = mFaceDetector.findFaces(mLastFrame, faces);
-                            Log.d("Face_Detection", "Face Count: " + String.valueOf(face_count));
+                            /*face_count = mFaceDetector.findFaces(mLastFrame, faces);
+                            Log.d("Face_Detection", "Face Count: " + String.valueOf(face_count));*/
                             Canvas canvas = new Canvas(mutableBitmap);
 
-                            for (int i = 0; i < face_count; i++) {
+                            /*for (int i = 0; i < face_count; i++) {
                                 FaceDetector.Face face = faces[i];
                                 tmp_paint.setColor(Color.RED);
                                 tmp_paint.setAlpha(100);
                                 face.getMidPoint(tmp_point);
                                 canvas.drawCircle(tmp_point.x, tmp_point.y, face.eyesDistance(),
                                         tmp_paint);
-                            }
+                            }*/
 
                             mCameraView.setImageBitmap(mutableBitmap);
                         }
@@ -86,6 +86,8 @@ public class RemotePreview {
 
     public RemotePreview(ChatActivity activity)
     {
+        mLastFrame = null;
+
         mActivity = new WeakReference<ChatActivity>(activity);
 
         mHandler = new ClientHandler(((ChatActivity)mActivity.get()));
@@ -98,7 +100,7 @@ public class RemotePreview {
                 // Background Code
                 Socket s;
                 try {
-                    s = new Socket("localhost", 5555);
+                    s = new Socket("localhost", 9191);
                     mClient = new ClientThread(s, mHandler);
                     new Thread(mClient).start();
                 } catch (Exception e) {
