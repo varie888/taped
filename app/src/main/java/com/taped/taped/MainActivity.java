@@ -38,6 +38,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.taped.camera.preview.RemotePreview;
 import com.taped.communication.CallCommunicator;
 import com.taped.communication.ICallCallback;
 import com.taped.communication.IListenCallback;
@@ -96,17 +97,21 @@ public class MainActivity extends AppCompatActivity {
     public class MainActivityCallCallback implements ICallCallback {
         public void callback(boolean approved)
         {
-            /*if (approved) {
+            if (approved) {
                 Intent intent = new Intent(MainActivity.this, ChatActivity.class);
                 startActivity(intent);
                 finish();
-            }*/
+            }
         }
     }
 
     public class MainActivityListenCallback implements IListenCallback {
         public boolean callback(String callstr)
         {
+            String ip = callstr.split(" ")[0];
+
+            RemotePreview.setServerIP(ip);
+
             Intent intent = new Intent(MainActivity.this, ChatActivity.class);
             startActivity(intent);
             finish();

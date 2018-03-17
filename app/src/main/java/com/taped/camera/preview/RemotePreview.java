@@ -27,7 +27,13 @@ public class RemotePreview {
     private ImageView mCameraView;
     private ClientThread mClient;
 
+    private static String mServerIP = null;
+
     private final WeakReference<ChatActivity> mActivity;
+
+    public static void setServerIP(String mServerIP) {
+        RemotePreview.mServerIP = mServerIP;
+    }
 
     public Bitmap getLastFrame() {
         return mLastFrame;
@@ -98,9 +104,13 @@ public class RemotePreview {
             @Override
             protected Void doInBackground(Void... unused) {
                 // Background Code
+
+                if (mServerIP == null)
+                    return null;
+
                 Socket s;
                 try {
-                    s = new Socket("localhost", 9191);
+                    s = new Socket(mServerIP, 9191);
                     mClient = new ClientThread(s, mHandler);
                     new Thread(mClient).start();
                 } catch (Exception e) {

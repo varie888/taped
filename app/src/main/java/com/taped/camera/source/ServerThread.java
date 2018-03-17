@@ -83,7 +83,7 @@ public class ServerThread implements Runnable {
                         System.out.println(mActivityInstance.getPreview().getFrameBuffer().size());
                         dos.write(mActivityInstance.getPreview().getFrameBuffer().toByteArray());
                         dos.flush();
-                        Thread.sleep(1000/15);
+                        Thread.sleep(1000/2);
                     }
 
                 } catch (Exception e) {
