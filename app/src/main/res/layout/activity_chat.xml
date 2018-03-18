@@ -32,7 +32,7 @@
         android:layout_height="150dp"
         android:layout_above="@+id/hangup_button"
         android:layout_alignParentTop="true"
-        android:layout_gravity="right" />
+        android:layout_gravity="bottom|right" />
     </FrameLayout>
     <FrameLayout
         android:layout_width="match_parent"

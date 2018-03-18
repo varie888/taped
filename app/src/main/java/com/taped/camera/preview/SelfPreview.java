@@ -23,6 +23,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.text.method.DateTimeKeyListener;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -47,6 +48,7 @@ import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -272,6 +274,9 @@ public class SelfPreview {
 //            e.printStackTrace();
 //        }
 //    }
+
+    private static long mLastSnap = System.currentTimeMillis();
+
     protected void createCameraPreview() {
         CameraManager manager = (CameraManager) mActivity.get().getSystemService(Context.CAMERA_SERVICE);
         try {
@@ -307,10 +312,17 @@ public class SelfPreview {
                 @Override
                 public void onImageAvailable(ImageReader reader) {
                     Image image = null;
+
                     try {
                         image = reader.acquireLatestImage();
                         if (image == null)
                             return;
+
+                        if (System.currentTimeMillis() - mLastSnap < 200) {
+                            return;
+                        }
+
+                        mLastSnap = System.currentTimeMillis();
 
                         ByteBuffer buffer = image.getPlanes()[0].getBuffer();
                         byte[] bytes = new byte[buffer.capacity()];

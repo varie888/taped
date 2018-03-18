@@ -68,14 +68,12 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        AutoCompleteTextView remoteiptv = (AutoCompleteTextView)findViewById(R.id.remoteip);
+        final AutoCompleteTextView remoteiptv = (AutoCompleteTextView)findViewById(R.id.remoteip);
 
         TextView iptv = (TextView)findViewById(R.id.my_ip_id);
 
         final String myip = Utils.getIPAddress(getApplicationContext());
         iptv.setText("My IP: " + myip);
-
-        final String remoteip = remoteiptv.getText().toString();
 
         mListenCB = new MainActivityListenCallback();
         CallCommunicator.listen(mListenCB);
@@ -86,6 +84,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Snackbar.make(view, "Calling...", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+
+                String remoteip = remoteiptv.getText().toString();
 
                 mCallCB = new MainActivityCallCallback();
                 // calling remote party

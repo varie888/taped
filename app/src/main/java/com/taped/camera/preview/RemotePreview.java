@@ -85,7 +85,7 @@ public class RemotePreview {
             } finally {
                 // 100% guarantee that this always happens, even if
                 // your update method throws an exception
-                mHandler.postDelayed(mStatusChecker, 1000/15);
+                mHandler.postDelayed(mStatusChecker, 1000/10);
             }
         }
     };
