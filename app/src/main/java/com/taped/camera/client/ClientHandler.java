@@ -12,7 +12,7 @@ import java.lang.ref.WeakReference;
  * Created by varie on 16/03/2018.
  */
 public class ClientHandler extends Handler {
-    private final WeakReference<ChatActivity> mActivity;
+    /*private final WeakReference<ChatActivity> mActivity;
 
     public ClientHandler(ChatActivity activity) {
         mActivity = new WeakReference<ChatActivity>(activity);
@@ -23,11 +23,11 @@ public class ClientHandler extends Handler {
         ChatActivity activity = mActivity.get();
         if (activity != null) {
             try {
-                activity.setLastFrame((Bitmap) msg.obj);
+                //activity.setLastFrame((Bitmap) msg.obj);
             } catch (Exception e) {
                 e.printStackTrace();
             }
             super.handleMessage(msg);
         }
-    }
+    }*/
 }

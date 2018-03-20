@@ -16,23 +16,39 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true">
-    <ImageView
-        android:id="@+id/camera_preview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:keepScreenOn="true"
-        android:textColor="#33b5e5"
-        android:textSize="50sp"
-        android:textStyle="bold" />
 
-    <TextureView
+
+
+        <!--<ImageView
+            android:id="@+id/camera_preview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:keepScreenOn="true"
+            android:textColor="#33b5e5"
+            android:textSize="50sp"
+            android:textStyle="bold" />-->
+        <net.majorkernelpanic.streaming.gl.SurfaceView
+            android:id="@+id/surface"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    <!--<TextureView
         android:id="@+id/texture"
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:layout_above="@+id/hangup_button"
         android:layout_alignParentTop="true"
-        android:layout_gravity="bottom|right" />
+        android:layout_gravity="bottom|right" />-->
+
+        <net.majorkernelpanic.streaming.gl.SurfaceView
+            android:id="@+id/preview_surface"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_above="@+id/hangup_button"
+            android:layout_alignParentTop="true"
+            android:layout_gravity="bottom|right" />
+
     </FrameLayout>
     <FrameLayout
         android:layout_width="match_parent"
@@ -50,13 +66,13 @@
             android:orientation="horizontal"
             tools:ignore="UselessParent">
 
-            <Button
+            <!--<Button
                 android:id="@+id/hangup_button"
                 style="?metaButtonBarButtonStyle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/hangup_button" />
+                android:text="@string/hangup_button" />-->
 
         </LinearLayout>
     </FrameLayout>

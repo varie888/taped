@@ -15,8 +15,8 @@ import java.net.Socket;
  * Created by varie on 16/03/2018.
  */
 
-public class ClientThread implements Runnable {
-    private Socket mSocket;
+public class ClientThread{//} implements Runnable {
+    /*private Socket mSocket;
     private Handler mHandler;
     private Boolean mRunFlag = true;
     final private String TAG = "ClientThread";
@@ -73,5 +73,5 @@ public class ClientThread implements Runnable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }*/
 }

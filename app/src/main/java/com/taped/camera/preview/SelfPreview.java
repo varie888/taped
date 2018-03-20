@@ -56,7 +56,7 @@ import java.util.List;
  */
 
 public class SelfPreview {
-    private static final String TAG = "ChatActivity";
+    /*private static final String TAG = "ChatActivity";
 
     public static final int CAMERA_PERMISSION_REQUEST_CODE = 3;
 
@@ -152,14 +152,14 @@ public class SelfPreview {
         }
     };
 
-    /*final CameraCaptureSession.CaptureCallback captureCallbackListener = new CameraCaptureSession.CaptureCallback() {
+    *//*final CameraCaptureSession.CaptureCallback captureCallbackListener = new CameraCaptureSession.CaptureCallback() {
         @Override
         public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request, TotalCaptureResult result) {
             super.onCaptureCompleted(session, request, result);
             Toast.makeText((ChatActivity)mActivity.get(), "Saved:" + file, Toast.LENGTH_SHORT).show();
             createCameraPreview();
         }
-    };*/
+    };*//*
     protected void startBackgroundThread() {
         mBackgroundThread = new HandlerThread("Camera Background");
         mBackgroundThread.start();
@@ -369,7 +369,7 @@ public class SelfPreview {
             e.printStackTrace();
         }
 
-        /*CameraManager manager = (CameraManager) mActivity.get().getSystemService(Context.CAMERA_SERVICE);
+        *//*CameraManager manager = (CameraManager) mActivity.get().getSystemService(Context.CAMERA_SERVICE);
         try {
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraDevice.getId());
             Size[] jpegSizes = null;
@@ -383,9 +383,9 @@ public class SelfPreview {
                 height = jpegSizes[0].getHeight();
             }
             ImageReader reader = ImageReader.newInstance(width, height, ImageFormat.JPEG, 1);
-            *//*List<Surface> outputSurfaces = new ArrayList<Surface>(2);
+            *//**//*List<Surface> outputSurfaces = new ArrayList<Surface>(2);
             outputSurfaces.add(reader.getSurface());
-            outputSurfaces.add(new Surface(textureView.getSurfaceTexture()));*//*
+            outputSurfaces.add(new Surface(textureView.getSurfaceTexture()));*//**//*
             captureStillBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
             captureStillBuilder.addTarget(reader.getSurface());
             captureStillBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
@@ -431,7 +431,7 @@ public class SelfPreview {
         }
         catch (CameraAccessException e) {
             e.printStackTrace();
-        }*/
+        }*//*
     }
     private void openCamera() {
         CameraManager manager = (CameraManager) mActivity.get().getSystemService(Context.CAMERA_SERVICE);
@@ -504,5 +504,5 @@ public class SelfPreview {
 
     public ByteArrayOutputStream getFrameBuffer(){
         return mFrameBuffer;
-    }
+    }*/
 }

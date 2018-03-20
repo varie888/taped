@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
         {
             String ip = callstr.split(" ")[0];
 
-            RemotePreview.setServerIP(ip);
+            ChatActivity.setServerIP(ip);
 
             Intent intent = new Intent(MainActivity.this, ChatActivity.class);
             startActivity(intent);

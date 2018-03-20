@@ -17,8 +17,8 @@ import android.widget.ImageView;
 /**
  * Created by varie on 16/03/2018.
  */
-public class ClientCameraView extends View {
-    public Bitmap mNextFrame;
+public class ClientCameraView{// extends View {
+    /*public Bitmap mNextFrame;
     public int face_count;
     private FaceDetector mFaceDetector = new FaceDetector(320,240,10);
     private FaceDetector.Face[] faces = new FaceDetector.Face[10];
@@ -52,5 +52,5 @@ public class ClientCameraView extends View {
             canvas.drawCircle(tmp_point.x, tmp_point.y, face.eyesDistance(),
                     tmp_paint);
         }
-    }
+    }*/
 }

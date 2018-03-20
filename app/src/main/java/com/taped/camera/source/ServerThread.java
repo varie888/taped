@@ -19,8 +19,8 @@ import java.net.Socket;
 /**
  * Created by varie on 16/03/2018.
  */
-public class ServerThread implements Runnable {
-    private int mServerPort;
+public class ServerThread{//} implements Runnable {
+    /*private int mServerPort;
     private String mServerIP;
     private Context mContext;
     private Handler mHandler;
@@ -104,5 +104,5 @@ public class ServerThread implements Runnable {
             }
         }
 
-    }
+    }*/
 }
