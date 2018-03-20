@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.taped.camera.preview.RemotePreview;
 import com.taped.camera.preview.SelfPreview;
 import com.taped.camera.source.ServerThread;
+import com.taped.utils.MarshMallowPermission;
 
 import net.majorkernelpanic.streaming.Session;
 import net.majorkernelpanic.streaming.SessionBuilder;
@@ -51,6 +52,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     //private SelfPreview mSelfPreview;
     //private RemotePreview mRemotePreview;
 
+    MarshMallowPermission marshMallowPermission;
+
     private SurfaceView mSurfaceView;
     private SurfaceView mSurfacePreView;
     private Session mSession;
@@ -59,7 +62,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private RtspServer mServer;
     private Session mServerSession;
 
-    private static String mServerIP = "localhost";
+    private static String mServerIP = null;
 
     public static void setServerIP(String serverIP)
     {
@@ -144,6 +147,16 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         setContentView(R.layout.activity_chat);
 
+        marshMallowPermission = new MarshMallowPermission(this);
+
+        if (!marshMallowPermission.checkPermissionForCamera()){
+            marshMallowPermission.requestPermissionForCamera();
+        }
+
+        if (!marshMallowPermission.checkPermissionForExternalStorage()){
+            marshMallowPermission.requestPermissionForExternalStorage();
+        }
+
         //mSelfPreview = new SelfPreview(this);
         //mRemotePreview = new RemotePreview(this);
 
@@ -181,7 +194,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 //.setAudioQuality(new AudioQuality(8000,16000))
                 .setVideoEncoder(SessionBuilder.VIDEO_H264)
                 .setSurfaceView(mSurfacePreView)
-                .setPreviewOrientation(0)
+                .setPreviewOrientation(90)
                 .setCallback(this)
                 .build();
 
@@ -193,8 +206,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         mSurfacePreView.getHolder().addCallback(this);
 
         selectQuality();
-
-        //toggleStream();
     }
 
     private void startStreamServer()
@@ -211,19 +222,25 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         //mServer.setAuthorization("user", "user1234");
 
         // Configures the SessionBuilder
-        SessionBuilder.getInstance()
+        mServerSession = SessionBuilder.getInstance()
                 .setSurfaceView(mSurfaceView)
                 .setPreviewOrientation(90)
                 .setContext(getApplicationContext())
                 .setAudioEncoder(SessionBuilder.AUDIO_NONE)
-                .setVideoEncoder(SessionBuilder.VIDEO_H264);
+                .setVideoEncoder(SessionBuilder.VIDEO_H264).build();
+
+        RtspServer.mSession = mServerSession;
 
         //mServer.start();
         // Starts the RTSP server
         this.startService(new Intent(this,RtspServer.class));
 
-        /*try {
-            Thread.sleep(5000);
+        mSurfaceView.getHolder().addCallback(this);
+
+        mServerSession.startPreview();
+/*
+        try {
+            Thread.sleep(3000);
         }
         catch (Exception e) {
 
@@ -290,7 +307,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        toggleStream();
+        //toggleStream();
         /*switch (v.getId()) {
             case R.id.start:
                 mLayoutServerSettings.setVisibility(View.GONE);
@@ -334,8 +351,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         super.onDestroy();
         mClient.release();
         mSession.release();
+        mServerSession.release();
         mSurfacePreView.getHolder().removeCallback(this);
-
     }
 
     private void selectQuality() {
@@ -381,6 +398,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             ip = m.group(1);
             port = m.group(2);
             path = m.group(3);*/
+
+            if (mServerIP == null)
+                return;
 
             //mClient.setCredentials("user", "user1234");
             mClient.setServerAddress(mServerIP, 1234);
@@ -498,5 +518,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         mClient.stopStream();
+        mServer.stop();
     }
 }
