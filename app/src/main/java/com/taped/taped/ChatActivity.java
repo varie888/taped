@@ -9,6 +9,8 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -36,6 +38,7 @@ import net.majorkernelpanic.streaming.rtsp.RtspClient;
 import net.majorkernelpanic.streaming.rtsp.RtspServer;
 import net.majorkernelpanic.streaming.video.VideoQuality;
 
+import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,21 +49,22 @@ import java.util.regex.Pattern;
 public class ChatActivity extends AppCompatActivity implements View.OnClickListener,
         RtspClient.Callback,
         Session.Callback,
-        SurfaceHolder.Callback{
+        SurfaceHolder.Callback,
+        MediaPlayer.OnErrorListener, MediaPlayer.OnPreparedListener{
     private static final String TAG = "ChatActivity";
 
-    //private SelfPreview mSelfPreview;
-    //private RemotePreview mRemotePreview;
+    private MediaPlayer mMediaPlayer;
+
+    private boolean mSurfaceCreated = false;
+    private boolean mMPReady = false;
 
     MarshMallowPermission marshMallowPermission;
 
-    private SurfaceView mSurfaceView;
+    private android.view.SurfaceView mSurfaceView;
     private SurfaceView mSurfacePreView;
-    private Session mSession;
-    private RtspClient mClient;
 
     private RtspServer mServer;
-    private Session mServerSession;
+    private Session mServerSession = null;
 
     private static String mServerIP = null;
 
@@ -147,23 +151,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         setContentView(R.layout.activity_chat);
 
-        marshMallowPermission = new MarshMallowPermission(this);
-
-        if (!marshMallowPermission.checkPermissionForCamera()){
-            marshMallowPermission.requestPermissionForCamera();
-        }
-
-        if (!marshMallowPermission.checkPermissionForExternalStorage()){
-            marshMallowPermission.requestPermissionForExternalStorage();
-        }
-
-        //mSelfPreview = new SelfPreview(this);
-        //mRemotePreview = new RemotePreview(this);
-
         mVisible = true;
         mControlsView = findViewById(R.id.fullscreen_content_controls);
         mContentView = findViewById(R.id.surface);
-
 
         // Set up the user interaction to manually show or hide the system UI.
         mContentView.setOnClickListener(new View.OnClickListener() {
@@ -178,73 +168,191 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         // while interacting with the UI.
         //findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
 
-        startStreamServer();
-
-        startStreamer();
+        if (mServerIP == null)
+            startStreamServer();
+        else
+            startPlayer();
     }
 
-    private void startStreamer()
+    @Override
+    public void onPrepared(MediaPlayer mp) {
+        //getPresenter().onMediaPlayerPrepared(mp);
+    }
+
+    @Override
+    public boolean onError(MediaPlayer mp, int what, int extra) {
+        if (extra == MediaPlayer.MEDIA_ERROR_IO) {
+            logError("MEDIA ERROR");
+        } else if (extra == MediaPlayer.MEDIA_ERROR_SERVER_DIED) {
+            logError("SERVER DIED ERROR");
+        } else if (extra == MediaPlayer.MEDIA_ERROR_UNSUPPORTED) {
+            logError("MEDIA UNSUPPORTED");
+        } else if (extra == MediaPlayer.MEDIA_ERROR_UNKNOWN) {
+            logError("MEDIA ERROR UNKNOWN");
+        } else if (extra == MediaPlayer.MEDIA_ERROR_NOT_VALID_FOR_PROGRESSIVE_PLAYBACK) {
+            logError("NOT VALID PROGRESSIVE PLAYBACK");
+        } else if (extra == MediaPlayer.MEDIA_ERROR_TIMED_OUT) {
+            logError("MEDIA ERROR TIMED OUT");
+        } else {
+            logError("ERROR UNKNOWN (" + what + ")" + "(" + extra + ")");
+        }
+        return false;
+    }
+
+    private void startPlayer()
     {
+
+        try {
+            Thread.sleep(3000);
+        }
+        catch (Exception e) {
+
+        }
+
         mSurfacePreView = (SurfaceView) findViewById(R.id.preview_surface);
+        mSurfacePreView.setVisibility(View.INVISIBLE);
 
-        // Configures the SessionBuilder
-        mSession = SessionBuilder.getInstance()
-                .setContext(getApplicationContext())
-                .setAudioEncoder(SessionBuilder.AUDIO_NONE)
-                //.setAudioQuality(new AudioQuality(8000,16000))
-                .setVideoEncoder(SessionBuilder.VIDEO_H264)
-                .setSurfaceView(mSurfacePreView)
-                .setPreviewOrientation(90)
-                .setCallback(this)
-                .build();
+        mSurfaceView = (android.view.SurfaceView) findViewById(R.id.surface);
+        mSurfaceView.setVisibility(View.VISIBLE);
 
-        // Configures the RTSP client
-        mClient = new RtspClient();
-        mClient.setSession(mSession);
-        mClient.setCallback(this);
+        /*if (mMediaPlayer == null) {
+            mMediaPlayer = new MediaPlayer();
+        }
 
-        mSurfacePreView.getHolder().addCallback(this);
+        mMediaPlayer.setOnErrorListener(this);
+        mMediaPlayer.setOnPreparedListener(this);
+        try {
+            mMediaPlayer.setDataSource(this, Uri.parse("rtsp://" + mServerIP + ":1234"));
+            mMediaPlayer.prepareAsync();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        selectQuality();
+        mSurfaceView.getHolder().addCallback(this);*/
+
+        startMediaPlayer("rtsp://" + mServerIP + ":1234");
+                //"rtsp://184.72.239.149/vod/mp4:BigBuckBunny_175k.mov");
+                //"rtsp://" + mServerIP + ":1234");
+
+        mSurfaceView.getHolder().addCallback(this);
+    }
+
+    private void startMediaPlayer(String url) {
+        if (mMediaPlayer == null)
+            mMediaPlayer = new MediaPlayer();
+        try {
+            mMediaPlayer.setDataSource(url);
+            mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+
+                @Override
+                public boolean onError(MediaPlayer mp, int what, int extra) {
+                    if (extra == MediaPlayer.MEDIA_ERROR_SERVER_DIED
+                            || extra == MediaPlayer.MEDIA_ERROR_MALFORMED) {
+                        //sendPlayerStatus("erroronplaying");
+                    } else if (extra == MediaPlayer.MEDIA_ERROR_IO) {
+                        //sendPlayerStatus("erroronplaying");
+                        return false;
+                    }
+                    return false;
+                }
+            });
+            mMediaPlayer.setOnBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener() {
+
+                public void onBufferingUpdate(MediaPlayer mp, int percent) {
+                    Log.e("onBufferingUpdate", "" + percent);
+
+                }
+            });
+            mMediaPlayer.prepareAsync();
+            mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+
+                public void onPrepared(MediaPlayer mp) {
+
+                    mMPReady = true;
+                    startMediaPlayer();
+                    //mMediaPlayer.start();
+                    //sendPlayerStatus("playing");
+                }
+            });
+            mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    Log.e("onCompletion", "Yes");
+                    //sendPlayerStatus("completed");
+                }
+            });
+            mMediaPlayer.setOnInfoListener(new MediaPlayer.OnInfoListener() {
+                @Override
+                public boolean onInfo(MediaPlayer mp, int what, int extra) {
+                    return false;
+                }
+            });
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void startMediaPlayer()
+    {
+        if (mMPReady && mSurfaceCreated)
+        {
+            mMediaPlayer.start();
+        }
     }
 
     private void startStreamServer()
     {
-        mSurfaceView = (SurfaceView) findViewById(R.id.surface);
+        marshMallowPermission = new MarshMallowPermission(this);
+
+        if (!marshMallowPermission.checkPermissionForCamera()){
+            marshMallowPermission.requestPermissionForCamera();
+        }
+
+        if (!marshMallowPermission.checkPermissionForExternalStorage()){
+            marshMallowPermission.requestPermissionForExternalStorage();
+        }
+
+        mSurfacePreView = (SurfaceView) findViewById(R.id.preview_surface);
+        mSurfacePreView.setVisibility(View.VISIBLE);
+
+        mSurfaceView = (android.view.SurfaceView) findViewById(R.id.surface);
+        mSurfaceView.setVisibility(View.INVISIBLE);
 
         // Sets the port of the RTSP server to 1234
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
         editor.putString(RtspServer.KEY_PORT, String.valueOf(1234));
         editor.commit();
 
-        //mServer = new RtspServer();
-        //mServer.setPort(1234);
-        //mServer.setAuthorization("user", "user1234");
-
         // Configures the SessionBuilder
         mServerSession = SessionBuilder.getInstance()
-                .setSurfaceView(mSurfaceView)
+                .setSurfaceView(mSurfacePreView)
                 .setPreviewOrientation(90)
+                .setCamera(Camera.CameraInfo.CAMERA_FACING_FRONT)
                 .setContext(getApplicationContext())
                 .setAudioEncoder(SessionBuilder.AUDIO_NONE)
                 .setVideoEncoder(SessionBuilder.VIDEO_H264).build();
 
+        /*SessionBuilder.getInstance()
+                .setSurfaceView(mSurfaceView)
+                .setPreviewOrientation(90)
+                .setContext(getApplicationContext())
+                .setAudioEncoder(SessionBuilder.AUDIO_NONE)
+                .setVideoEncoder(SessionBuilder.VIDEO_H264);
+*/
+
+        selectQuality();
+
         RtspServer.mSession = mServerSession;
 
-        //mServer.start();
         // Starts the RTSP server
         this.startService(new Intent(this,RtspServer.class));
 
-        mSurfaceView.getHolder().addCallback(this);
-
-        mServerSession.startPreview();
-/*
-        try {
-            Thread.sleep(3000);
-        }
-        catch (Exception e) {
-
-        }*/
+        mSurfacePreView.getHolder().addCallback(this);
 
     }
 
@@ -259,7 +367,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void toggle() {
-        toggleStream();
         if (mVisible) {
             hide();
         } else {
@@ -307,51 +414,14 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        //toggleStream();
-        /*switch (v.getId()) {
-            case R.id.start:
-                mLayoutServerSettings.setVisibility(View.GONE);
-                toggleStream();
-                break;
-            case R.id.flash:
-                if (mButtonFlash.getTag().equals("on")) {
-                    mButtonFlash.setTag("off");
-                    mButtonFlash.setImageResource(R.drawable.ic_flash_on_holo_light);
-                } else {
-                    mButtonFlash.setImageResource(R.drawable.ic_flash_off_holo_light);
-                    mButtonFlash.setTag("on");
-                }
-                mSession.toggleFlash();
-                break;
-            case R.id.camera:
-                mSession.switchCamera();
-                break;
-            case R.id.settings:
-                if (mLayoutVideoSettings.getVisibility() == View.GONE &&
-                        mLayoutServerSettings.getVisibility() == View.GONE) {
-                    mLayoutServerSettings.setVisibility(View.VISIBLE);
-                } else {
-                    mLayoutServerSettings.setVisibility(View.GONE);
-                    mLayoutVideoSettings.setVisibility(View.GONE);
-                }
-                break;
-            case R.id.video:
-                mRadioGroup.clearCheck();
-                mLayoutServerSettings.setVisibility(View.GONE);
-                mLayoutVideoSettings.setVisibility(View.VISIBLE);
-                break;
-            case R.id.save:
-                mLayoutServerSettings.setVisibility(View.GONE);
-                break;
-        }*/
+
     }
 
     @Override
     public void onDestroy(){
         super.onDestroy();
-        mClient.release();
-        mSession.release();
-        mServerSession.release();
+        if (mServerSession != null)
+            mServerSession.release();
         mSurfacePreView.getHolder().removeCallback(this);
     }
 
@@ -366,52 +436,17 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         int framerate = Integer.parseInt(matcher.group(3));
         int bitrate = Integer.parseInt(matcher.group(4))*1000;
 
-        mSession.setVideoQuality(new VideoQuality(width, height, framerate, bitrate));
+        mServerSession.setVideoQuality(new VideoQuality(width, height, framerate, bitrate));
         //Toast.makeText(this, ((RadioButton)findViewById(id)).getText(), Toast.LENGTH_SHORT).show();
 
         Log.d(TAG, "Selected resolution: "+width+"x"+height);
     }
 
     private void enableUI() {
-        /*mButtonStart.setEnabled(true);
-        mButtonCamera.setEnabled(true);*/
+
     }
 
-    // Connects/disconnects to the RTSP server and starts/stops the stream
-    public void toggleStream() {
-        //mProgressBar.setVisibility(View.VISIBLE);
-        if (!mClient.isStreaming()) {
-            //String ip,port,path;
 
-/*            // We save the content user inputs in Shared Preferences
-            SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(ChatActivity.this);
-            SharedPreferences.Editor editor = mPrefs.edit();
-            String uri = mServerIP + ":1234";
-            editor.putString("uri", uri);
-            editor.putString("password", "");
-            editor.putString("username", "");
-            editor.commit();
-
-            // We parse the URI written in the Editext
-            Pattern uri = Pattern.compile("rtsp://(.+):(\\d*)/(.+)");
-            Matcher m = uri.matcher(mEditTextURI.getText()); m.find();
-            ip = m.group(1);
-            port = m.group(2);
-            path = m.group(3);*/
-
-            if (mServerIP == null)
-                return;
-
-            //mClient.setCredentials("user", "user1234");
-            mClient.setServerAddress(mServerIP, 1234);
-            //mClient.setStreamPath("/");
-            mClient.startStream();
-
-        } else {
-            // Stops the stream and disconnects from the RTSP server
-            mClient.stopStream();
-        }
-    }
 
     private void logError(final String msg) {
         final String error = (msg == null) ? "Error unknown" : msg;
@@ -475,7 +510,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             case Session.ERROR_STORAGE_NOT_READY:
                 break;
             case Session.ERROR_CONFIGURATION_NOT_SUPPORTED:
-                VideoQuality quality = mSession.getVideoTrack().getVideoQuality();
+                VideoQuality quality = mServerSession.getVideoTrack().getVideoQuality();
                 logError("The following settings are not supported on this phone: "+
                         quality.toString()+" "+
                         "("+e.getMessage()+")");
@@ -493,7 +528,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onRtspUpdate(int message, Exception e) {
-        switch (message) {
+        /*switch (message) {
             case RtspClient.ERROR_CONNECTION_FAILED:
             case RtspClient.ERROR_WRONG_CREDENTIALS:
                 //mProgressBar.setVisibility(View.GONE);
@@ -501,7 +536,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 logError(e.getMessage());
                 e.printStackTrace();
                 break;
-        }
+        }*/
     }
 
 
@@ -512,12 +547,24 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        mSession.startPreview();
+        mSurfaceCreated = true;
+
+        if (mServerSession != null) {
+            mServerSession.startPreview();
+        }
+        else
+        {
+            if (mMediaPlayer != null) {
+                mMediaPlayer.setDisplay(mSurfaceView.getHolder());
+
+                startMediaPlayer();
+            }
+        }
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        mClient.stopStream();
-        mServer.stop();
+        if (mServer != null)
+            mServer.stop();
     }
 }

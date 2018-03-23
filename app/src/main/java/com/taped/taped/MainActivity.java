@@ -87,6 +87,8 @@ public class MainActivity extends AppCompatActivity {
 
                 String remoteip = remoteiptv.getText().toString();
 
+                //ChatActivity.setServerIP(remoteip);
+
                 mCallCB = new MainActivityCallCallback();
                 // calling remote party
                 CallCommunicator.call(mCallCB, myip, remoteip);
