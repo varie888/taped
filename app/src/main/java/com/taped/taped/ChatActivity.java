@@ -25,9 +25,6 @@ import android.view.SurfaceHolder;
 import android.view.View;
 import android.widget.RadioGroup;
 import android.widget.Toast;
-import com.taped.camera.preview.RemotePreview;
-import com.taped.camera.preview.SelfPreview;
-import com.taped.camera.source.ServerThread;
 import com.taped.utils.MarshMallowPermission;
 
 import net.majorkernelpanic.streaming.Session;
@@ -552,13 +549,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         if (mServerSession != null) {
             mServerSession.startPreview();
         }
-        else
-        {
-            if (mMediaPlayer != null) {
-                mMediaPlayer.setDisplay(mSurfaceView.getHolder());
 
-                startMediaPlayer();
-            }
+        if (mMediaPlayer != null) {
+            mMediaPlayer.setDisplay(mSurfaceView.getHolder());
+
+            startMediaPlayer();
         }
     }
 

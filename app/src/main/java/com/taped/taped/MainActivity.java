@@ -38,7 +38,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.taped.camera.preview.RemotePreview;
 import com.taped.communication.CallCommunicator;
 import com.taped.communication.ICallCallback;
 import com.taped.communication.IListenCallback;
