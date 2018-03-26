@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#FF4081</color>
     <color name="colorPrimaryDark">#d13469</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorAccent">#ff4081</color>
     <!-- Splash Screen theme. -->
     <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowBackground">@drawable/ic_launcher_background</item>

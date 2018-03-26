@@ -20,6 +20,8 @@
     <string name="action_listen">Listen</string>
 
     <string name="myip">My IP: 10.107.107.145</string>
+    <string name="select_quality_title">Select Video Quality</string>
+
 
     <string name="title_activity_call">Call</string>
     <string name="receive_button">Receive</string>

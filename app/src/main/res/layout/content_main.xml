@@ -2,6 +2,7 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_cont"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
@@ -55,6 +56,73 @@
                 android:textSize="22sp"
                 android:textStyle="bold" />
 
+            <TextView
+                android:id="@+id/select_quality_title_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="48dp"
+                android:text="@string/select_quality_title"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <RadioGroup
+                android:id="@+id/radio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/bg">
+
+                <RadioButton
+                    android:id="@+id/radio1"
+                    style="@style/RadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="176x144, 30 fps, 170 Kbps" />
+
+                <RadioButton
+                    android:id="@+id/radio2"
+                    style="@style/RadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="176x144, 30 fps, 200 Kbps" />
+
+                <RadioButton
+                    android:id="@+id/radio3"
+                    style="@style/RadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="176x144, 30 fps, 250 Kbps" />
+
+                <RadioButton
+                    android:id="@+id/radio6"
+                    style="@style/RadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="320x240, 30 fps, 250 Kbps" />
+
+                <RadioButton
+                    android:id="@+id/radio7"
+                    style="@style/RadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="352x288, 30 fps, 300 Kbps" />
+
+                <RadioButton
+                    android:id="@+id/radio8"
+                    style="@style/RadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="352x288, 30 fps, 400 Kbps" />
+
+                <RadioButton
+                    android:id="@+id/radio9"
+                    style="@style/RadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="640x480, 30 fps, 600 Kbps" />
+            </RadioGroup>
         </LinearLayout>
     </ScrollView>
 </android.support.constraint.ConstraintLayout>

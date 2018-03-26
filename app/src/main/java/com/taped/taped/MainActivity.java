@@ -35,6 +35,8 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,6 +45,7 @@ import com.taped.communication.ICallCallback;
 import com.taped.communication.IListenCallback;
 import com.taped.utils.MarshMallowPermission;
 import com.taped.utils.Utils;
+import com.taped.utils.VideoParameters;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -53,16 +56,26 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements
+        RadioGroup.OnCheckedChangeListener{
 
     private MainActivityListenCallback mListenCB;
     private MainActivityCallCallback mCallCB;
+
+    private RadioGroup mRadioGroup;
+
+    private VideoParameters mVidParams = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mRadioGroup =  (RadioGroup) findViewById(R.id.radio);
+        mRadioGroup.setOnCheckedChangeListener(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -93,6 +106,13 @@ public class MainActivity extends AppCompatActivity {
                 CallCommunicator.call(mCallCB, myip, remoteip);
             }
         });
+
+        selectQuality();
+    }
+
+    @Override
+    public void onCheckedChanged(RadioGroup group, int checkedId) {
+        selectQuality();
     }
 
     public class MainActivityCallCallback implements ICallCallback {
@@ -100,6 +120,10 @@ public class MainActivity extends AppCompatActivity {
         {
             if (approved) {
                 Intent intent = new Intent(MainActivity.this, ChatActivity.class);
+                intent.putExtra("Width", mVidParams.Width);
+                intent.putExtra("Height", mVidParams.Height);
+                intent.putExtra("Framerate", mVidParams.Framerate);
+                intent.putExtra("Bitrate", mVidParams.Bitrate);
                 startActivity(intent);
                 finish();
             }
@@ -121,4 +145,28 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void selectQuality() {
+        int id = mRadioGroup.getCheckedRadioButtonId();
+        RadioButton button = (RadioButton) findViewById(id);
+        if (button == null) return;
+
+        String text = button.getText().toString();
+        Pattern pattern = Pattern.compile("(\\d+)x(\\d+)\\D+(\\d+)\\D+(\\d+)");
+        Matcher matcher = pattern.matcher(text);
+
+        matcher.find();
+        int width = Integer.parseInt(matcher.group(1));
+        int height = Integer.parseInt(matcher.group(2));
+        int framerate = Integer.parseInt(matcher.group(3));
+        int bitrate = Integer.parseInt(matcher.group(4))*1000;
+
+        mVidParams = new VideoParameters();
+        mVidParams.Width = width;
+        mVidParams.Height = height;
+        mVidParams.Framerate = framerate;
+        mVidParams.Bitrate = bitrate;
+
+        //mSession.setVideoQuality(new VideoQuality(width, height, framerate, bitrate));
+        Toast.makeText(this, ((RadioButton)findViewById(id)).getText(), Toast.LENGTH_SHORT).show();
+    }
 }

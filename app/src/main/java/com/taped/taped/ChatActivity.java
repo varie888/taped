@@ -334,6 +334,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 .setAudioEncoder(SessionBuilder.AUDIO_NONE)
                 .setVideoEncoder(SessionBuilder.VIDEO_H264).build();
 
+
         /*SessionBuilder.getInstance()
                 .setSurfaceView(mSurfaceView)
                 .setPreviewOrientation(90)
@@ -423,7 +424,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void selectQuality() {
-        String text = "320x240, 30 fps, 250 Kbps";
+        /*String text = "320x240, 30 fps, 250 Kbps";
         Pattern pattern = Pattern.compile("(\\d+)x(\\d+)\\D+(\\d+)\\D+(\\d+)");
         Matcher matcher = pattern.matcher(text);
 
@@ -432,9 +433,15 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         int height = Integer.parseInt(matcher.group(2));
         int framerate = Integer.parseInt(matcher.group(3));
         int bitrate = Integer.parseInt(matcher.group(4))*1000;
+*/
+        Intent intent = getIntent();
+
+        int width = intent.getIntExtra("Width", 320);
+        int height = intent.getIntExtra("Height", 240);
+        int framerate = intent.getIntExtra("Framerate", 30);
+        int bitrate = intent.getIntExtra("Bitrate", 250000);
 
         mServerSession.setVideoQuality(new VideoQuality(width, height, framerate, bitrate));
-        //Toast.makeText(this, ((RadioButton)findViewById(id)).getText(), Toast.LENGTH_SHORT).show();
 
         Log.d(TAG, "Selected resolution: "+width+"x"+height);
     }
